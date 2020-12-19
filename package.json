@@ -1,0 +1,20 @@
+{
+  "name": "nofeechristmas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "DrCas#0001",
+  "license": "ISC",
+  "dependencies": {
+    "@logdna/logger": "^2.1.1",
+    "chalk": "^4.1.0",
+    "discord.js": "^12.5.1",
+    "log-to-file": "^2.0.2",
+    "moment": "^2.29.1",
+    "pg": "^8.5.1",
+    "sequelize": "^6.3.5"
+  }
+}
