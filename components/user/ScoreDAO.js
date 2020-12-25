@@ -1,6 +1,7 @@
 const Logger = require('../../util/Logger');
 const Scores = require('./Scores');
 const Score = require('./Score');
+const { Op } = require('sequelize');
 
 module.exports = {
     /**
@@ -21,7 +22,7 @@ module.exports = {
         if (!scoreData) {
             return await this.createNewScore(userID, guildID);
         }
-        return new Score(scoreData.userID, scoreData.guildID, 0);
+        return new Score(scoreData.userID, scoreData.guildID, scoreData.points);
     },
     
     /**
@@ -51,6 +52,28 @@ module.exports = {
     },
 
     /**
+     * Returns position in leaderboard
+     * @param {BigInt} guildID 
+     * @param {BigInt} userID 
+     */
+    async getScorePosition(guildID, userID) {
+        const userScore = await this.getScoreData(userID, guildID);
+
+        const scoreData = await Scores.findAll({
+            where: {
+                guildID: guildID,
+                points: {
+                    [Op.gte]: userScore.getPoints()
+                }
+            },
+            order: [['points', 'DESC']]
+        }).catch(err => Logger.db_error(err));
+
+        if(!scoreData) return 0;
+        return scoreData.length;
+    },
+
+    /**
      * Creates a new score in the database and returns a new Score.
      * @param {BigInt} userID 
      * @returns {Score}
@@ -72,7 +95,7 @@ module.exports = {
      * @param {Integer} points 
      */
     async updatePoints(userID, guildID, points) {
-        this.getScoreData(userID, guildID); //Make sure there is always a user object
+        await this.getScoreData(userID, guildID); //Make sure there is always a user object
 
         await Scores.increment({
             points: +points

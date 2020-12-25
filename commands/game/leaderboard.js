@@ -14,6 +14,7 @@ module.exports = {
 
         if(!message.guild) return message.channel.send('This command cannot be run in DMs!');
 
+        let isInTop10 = false;
         let description = '';
         const scoreList = await ScoreDAO.getTopScores(message.guild.id, 10, 0);
 
@@ -33,6 +34,15 @@ module.exports = {
 
             }
             description += `${(await message.client.users.fetch(scoreList[i].getUserID())).username}: ${scoreList[i].getPoints()}\n`;
+
+            if(scoreList[i].getUserID() == message.author.id) isInTop10 = true;
+        }
+
+        if(!isInTop10) {
+            const position = await ScoreDAO.getScorePosition(message.guild.id, message.author.id);
+            const points = await ScoreDAO.getScoreData(message.author.id, message.guild.id);
+
+            description += `...\n${position}. ${message.author.username}: ${points.getPoints()}`;
         }
 
 
